@@ -1,0 +1,84 @@
+-------------------------------------------------------------------------------
+Test set: com.parkit.parkingsystem.ParkingServiceTest
+-------------------------------------------------------------------------------
+Tests run: 7, Failures: 1, Errors: 5, Skipped: 0, Time elapsed: 2.862 s <<< FAILURE! - in com.parkit.parkingsystem.ParkingServiceTest
+testGetNextParkingNumberIfAvailableParkingNumberNotFound  Time elapsed: 2.644 s  <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:37)
+  2. -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:44)
+  3. -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:45)
+  4. -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:47)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+
+processExitingVehicleTestUnableUpdate  Time elapsed: 0.005 s  <<< ERROR!
+org.mockito.exceptions.misusing.PotentialStubbingProblem: 
+
+Strict stubbing argument mismatch. Please check:
+ - this invocation of 'updateTicket' method:
+    ticketDAO.updateTicket(null);
+    -> at com.parkit.parkingsystem.ParkingServiceTest.processExitingVehicleTestUnableUpdate(ParkingServiceTest.java:81)
+ - has following stubbing(s) with different arguments:
+    1. ticketDAO.updateTicket(null);
+      -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:45)
+Typically, stubbing argument mismatch indicates user mistake when writing tests.
+Mockito fails early so that you can debug potential problem easily.
+However, there are legit scenarios when this exception generates false negative signal:
+  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API
+    Please use 'will().given()' or 'doReturn().when()' API for stubbing.
+  - stubbed method is intentionally invoked with different arguments by code under test
+    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).
+For more information see javadoc for PotentialStubbingProblem class.
+	at com.parkit.parkingsystem.ParkingServiceTest.processExitingVehicleTestUnableUpdate(ParkingServiceTest.java:81)
+
+testGetNextParkingNumberIfAvailableParkingNumberWrongArgument  Time elapsed: 0.002 s  <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:37)
+  2. -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:44)
+  3. -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:45)
+  4. -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:47)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+
+testGetNextParkingNumberIfAvailable  Time elapsed: 0.003 s  <<< ERROR!
+org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+
+Unnecessary stubbings detected.
+Clean & maintainable test code requires zero unnecessary code.
+Following stubbings are unnecessary (click to navigate to relevant line of code):
+  1. -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:37)
+  2. -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:44)
+  3. -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:45)
+  4. -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:47)
+Please remove unnecessary stubbings or use 'lenient' strictness. More info: javadoc for UnnecessaryStubbingException class.
+
+testProcessIncomingVehicle  Time elapsed: 0.002 s  <<< ERROR!
+org.mockito.exceptions.misusing.PotentialStubbingProblem: 
+
+Strict stubbing argument mismatch. Please check:
+ - this invocation of 'updateParking' method:
+    parkingSpotDAO.updateParking(null);
+    -> at com.parkit.parkingsystem.ParkingServiceTest.testProcessIncomingVehicle(ParkingServiceTest.java:71)
+ - has following stubbing(s) with different arguments:
+    1. parkingSpotDAO.updateParking(null);
+      -> at com.parkit.parkingsystem.ParkingServiceTest.setUpPerTest(ParkingServiceTest.java:47)
+Typically, stubbing argument mismatch indicates user mistake when writing tests.
+Mockito fails early so that you can debug potential problem easily.
+However, there are legit scenarios when this exception generates false negative signal:
+  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API
+    Please use 'will().given()' or 'doReturn().when()' API for stubbing.
+  - stubbed method is intentionally invoked with different arguments by code under test
+    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).
+For more information see javadoc for PotentialStubbingProblem class.
+	at com.parkit.parkingsystem.ParkingServiceTest.testProcessIncomingVehicle(ParkingServiceTest.java:71)
+
+processExitingVehicleTestUnableUpdateNotUpdateParkingSpot  Time elapsed: 0.005 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: No exception should be thrown
+	at com.parkit.parkingsystem.ParkingServiceTest.processExitingVehicleTestUnableUpdateNotUpdateParkingSpot(ParkingServiceTest.java:165)
+
