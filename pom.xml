@@ -3,6 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>com.parkit</groupId>
     <artifactId>parking-system</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -12,8 +13,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <jacoco.report.dir>${project.reporting.outputDirectory}/jacoco</jacoco.report.dir>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -48,41 +49,33 @@
             <version>2.23.4</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.8.5</version>
-            <type>maven-plugin</type>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>3.0.0</version>
-        </dependency>
     </dependencies>
-
+    <pluginRepositories>
+        <pluginRepository>
+            <id>sigpwned-repo</id>
+            <url>https://repo.sigpwned.com/maven/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
                 <executions>
                     <execution>
+                        <id>make-fat-jar</id>
                         <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
+                        <goals><goal>single</goal></goals>
                         <configuration>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
                             <archive>
                                 <manifest>
-                                    <mainClass>
-                                        com.parkit.parkingsystem.App
-                                    </mainClass>
+                                    <mainClass>com.parkit.parkingsystem.App</mainClass>
                                 </manifest>
                             </archive>
-                            <descriptorRefs>
-                                <descriptorRef>executable-jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
                         </configuration>
                     </execution>
                 </executions>
@@ -106,14 +99,9 @@
                 <executions>
                     <execution>
                         <id>integration-test</id>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
                         <phase>integration-test</phase>
+                        <goals><goal>test</goal></goals>
                         <configuration>
-                            <excludes>
-                                <exclude>none</exclude>
-                            </excludes>
                             <includes>
                                 <include>**/*IT.java</include>
                             </includes>
@@ -124,20 +112,27 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.5</version>
+                <version>0.8.10</version>
+
                 <executions>
+                    <!-- instrumentation avant les tests -->
                     <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
+                        <goals><goal>prepare-agent</goal></goals>
                     </execution>
+
+                    <!-- génération du rapport HTML + CSV -->
                     <execution>
                         <id>jacoco-report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
+                        <phase>verify</phase>
+                        <goals><goal>report-aggregate</goal></goals>
                         <configuration>
+                            <formats>
+                                <format>HTML</format>
+                                <format>CSV</format>    <!-- ← indispensable pour le badge -->
+                            </formats>
+
+
+                            <!-- exclusions facultatives : garde-les si tu veux -->
                             <excludes>
                                 <exclude>**/model/**</exclude>
                                 <exclude>**/*Logger*</exclude>
@@ -149,7 +144,30 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.sigpwned</groupId>
+                <artifactId>jacoco-badge-maven-plugin</artifactId>
+                <version>0.1.4</version>
+
+                <executions>
+                    <execution>
+                        <id>generate-jacoco-badge</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>badge</goal>
+                        </goals>
+
+
+                        <configuration>
+
+                            <metric>instruction</metric>
+
+                            <passing>70</passing>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
-
 </project>
