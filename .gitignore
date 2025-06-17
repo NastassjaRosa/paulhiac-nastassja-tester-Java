@@ -1,0 +1,13 @@
+# --- OUTPUT MAVEN ----------------------------------------------------------
+/target/
+
+# Rapports JaCoCo / Surefire
+**/site/
+**/surefire-reports/
+
+# Fichiers générés par l’IDE
+.idea/
+*.iml
+
+# Autres fichiers temporaires
+*.log
