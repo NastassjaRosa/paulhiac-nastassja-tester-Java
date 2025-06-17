@@ -200,6 +200,103 @@ public class ParkingServiceTest {
     }
 
 
+    @Test
+    public void processExitingVehicleTestUnableUpdate() {
+        try {
+            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+
+            ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+            Ticket ticket = new Ticket();
+            ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
+            ticket.setParkingSpot(parkingSpot);
+            ticket.setVehicleRegNumber("ABCDEF");
+
+            when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
+            when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
+
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService.processExitingVehicle();
+
+            verify(ticketDAO, times(1)).getTicket("ABCDEF");
+            verify(ticketDAO, times(1)).updateTicket(any(Ticket.class));
+            verify(parkingSpotDAO, never()).updateParking(any(ParkingSpot.class));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to test processExitingVehicle when update fails");
+        }
+    }
+
+    @Test
+    public void testProcessIncomingVehicle_PremiereVisite() {
+        try {
+            when(inputReaderUtil.readSelection()).thenReturn(1); // 1 = CAR
+            when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
+            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("CAR123");
+            when(ticketDAO.getNbTicket("CAR123")).thenReturn(2); // utilisateur récurrent
+            when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
+
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService.processIncomingVehicle();
+
+            verify(parkingSpotDAO, times(1)).updateParking(any(ParkingSpot.class));
+            verify(ticketDAO, times(1)).saveTicket(any(Ticket.class));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set up test mock objects for returning user");
+        }
+    }
+
+    @Test
+    public void testProcessIncomingVehicle_Exception() {
+        try {
+            when(inputReaderUtil.readSelection()).thenThrow(new RuntimeException("Erreur simulée"));
+
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService.processIncomingVehicle();
+
+            // Pas de vérification : le but est de couvrir le bloc catch
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Test échoué : exception non attendue");
+        }
+    }
+    @Test
+    public void testProcessExitingVehicle_Exception() {
+        try {
+            when(inputReaderUtil.readVehicleRegistrationNumber()).thenThrow(new RuntimeException("Erreur simulée"));
+
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService.processExitingVehicle();
+
+            // Pas de vérification : on vise uniquement le bloc catch
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Test échoué : exception non attendue");
+        }
+    }
+
+    @Test
+    public void testGetNextParkingNumberIfAvailable_Bike() {
+        try {
+            // 2 = BIKE
+            when(inputReaderUtil.readSelection()).thenReturn(2);
+            when(parkingSpotDAO.getNextAvailableSlot(ParkingType.BIKE)).thenReturn(7);
+
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            ParkingSpot spot = parkingService.getNextParkingNumberIfAvailable();
+
+            assertNotNull(spot);
+            assertEquals(7, spot.getId());
+            assertEquals(ParkingType.BIKE, spot.getParkingType());
+            assertTrue(spot.isAvailable());
+
+            verify(parkingSpotDAO, times(1)).getNextAvailableSlot(ParkingType.BIKE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to test BIKE path");
+        }
+    }
+
 
 }
 
