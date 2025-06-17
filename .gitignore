@@ -1,5 +1,5 @@
 # --- OUTPUT MAVEN ----------------------------------------------------------
-/target/
+
 
 # Rapports JaCoCo / Surefire
 **/site/
@@ -11,3 +11,10 @@
 
 # Autres fichiers temporaires
 *.log
+
+# Maven
+/target/
+
+# Rapports JaCoCo
+**/jacoco.exec
+
