@@ -144,7 +144,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+           <!-- <plugin>
                 <groupId>com.sigpwned</groupId>
                 <artifactId>jacoco-badge-maven-plugin</artifactId>
                 <version>0.1.4</version>
@@ -166,7 +166,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
 
         </plugins>
     </build>
