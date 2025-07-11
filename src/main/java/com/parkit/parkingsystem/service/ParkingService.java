@@ -26,7 +26,7 @@ public class ParkingService {
         this.parkingSpotDAO = parkingSpotDAO;
         this.ticketDAO = ticketDAO;
     }
-
+    //Gère l’arrivée d’un véhicule : lecture de la plaque, attribution de place, création du ticket, message de réduction si l'utilisateur est récurrent
     public void processIncomingVehicle() {
         try{
             ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
@@ -59,12 +59,12 @@ public class ParkingService {
             logger.error("Unable to process incoming vehicle",e);
         }
     }
-
+//Demande à l’utilisateur de saisir la plaque d’immatriculation
     private String getVehichleRegNumber() throws Exception {
         System.out.println("Please type the vehicle registration number and press enter key");
         return inputReaderUtil.readVehicleRegistrationNumber();
     }
-
+    // Cherche la prochaine place disponible en fonction du type de véhicule
     public ParkingSpot getNextParkingNumberIfAvailable(){
         int parkingNumber=0;
         ParkingSpot parkingSpot = null;
@@ -83,7 +83,7 @@ public class ParkingService {
         }
         return parkingSpot;
     }
-
+   // Demande à l’utilisateur de choisir le type de véhicule voiture ou moto
     private ParkingType getVehichleType(){
         System.out.println("Please select vehicle type from menu");
         System.out.println("1 CAR");
@@ -102,7 +102,7 @@ public class ParkingService {
             }
         }
     }
-
+    //Gère la sortie d’un véhicule : calcul du tarif (avec ou sans réduction), mise à jour du ticket et libération de la place
     public void processExitingVehicle() {
         try{
             String vehicleRegNumber = getVehichleRegNumber();
@@ -112,6 +112,8 @@ public class ParkingService {
            // fareCalculatorService.calculateFare(ticket);
             //New
             int nbPreviousTickets = ticketDAO.getNbTicket(vehicleRegNumber);
+            // Appelle la méthode calculateFare qui applique la gratuité si stationnement < 30 min,
+// et une remise de 5 % si l’utilisateur a déjà plus d’un ticket (utilisateur récurrent)
             fareCalculatorService.calculateFare(ticket, nbPreviousTickets > 1);
 
             if(ticketDAO.updateTicket(ticket)) {
