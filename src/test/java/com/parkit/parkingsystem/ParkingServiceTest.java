@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem;
 
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
@@ -296,6 +297,95 @@ public class ParkingServiceTest {
             throw new RuntimeException("Failed to test BIKE path");
         }
     }
+    @Test
+    public void processExitingVehicle_shouldApplyDiscount_forReturningUser() {
+        try {
+            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+
+            ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+            Ticket ticket = new Ticket();
+            ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000))); // 1h de stationnement
+            ticket.setParkingSpot(parkingSpot);
+            ticket.setVehicleRegNumber("ABCDEF");
+
+            when(ticketDAO.getTicket("ABCDEF")).thenReturn(ticket);
+            when(ticketDAO.getNbTicket("ABCDEF")).thenReturn(2); // utilisateur récurrent
+            when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
+            when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
+
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService.processExitingVehicle();
+
+            verify(ticketDAO, times(1)).getNbTicket("ABCDEF");
+            verify(ticketDAO, times(1)).updateTicket(any(Ticket.class));
+            verify(parkingSpotDAO, times(1)).updateParking(any(ParkingSpot.class));
+
+            // Vérifie que le prix a été appliqué avec remise
+            assertNotNull(ticket.getPrice());
+            assertTrue(ticket.getPrice() > 0);
+            assertTrue(ticket.getPrice() < 1.5); // tarif normal d'1h pour CAR = 1.5
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to test discount for returning user");
+        }
+    }
+    @Test
+    public void processExitingVehicle_shouldNotApplyDiscount_forFirstTimeUser() {
+        try {
+            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("XYZ123");
+
+            ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+            Ticket ticket = new Ticket();
+            ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000))); // 1h
+            ticket.setParkingSpot(parkingSpot);
+            ticket.setVehicleRegNumber("XYZ123");
+
+            when(ticketDAO.getTicket("XYZ123")).thenReturn(ticket);
+            when(ticketDAO.getNbTicket("XYZ123")).thenReturn(1); // premier passage
+            when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
+            when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
+
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService.processExitingVehicle();
+
+            verify(ticketDAO, times(1)).getNbTicket("XYZ123");
+            assertNotNull(ticket.getPrice());
+            assertEquals(Fare.CAR_RATE_PER_HOUR, ticket.getPrice(), 0.01); // plein tarif
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Exception during test of first-time user discount check");
+        }
+    }
+
+    @Test
+    public void processExitingVehicle_shouldApplyDiscount_forUserWithMultiplePreviousVisits() {
+        try {
+            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("XYZ789");
+
+            ParkingSpot parkingSpot = new ParkingSpot(2, ParkingType.CAR, false);
+            Ticket ticket = new Ticket();
+            ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000))); // 1h
+            ticket.setParkingSpot(parkingSpot);
+            ticket.setVehicleRegNumber("XYZ789");
+
+            when(ticketDAO.getTicket("XYZ789")).thenReturn(ticket);
+            when(ticketDAO.getNbTicket("XYZ789")).thenReturn(3); // Plus de 2 passages
+            when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
+            when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
+
+            parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+            parkingService.processExitingVehicle();
+
+            verify(ticketDAO, times(1)).getNbTicket("XYZ789");
+            assertNotNull(ticket.getPrice());
+            assertEquals(1.425, ticket.getPrice(), 0.01); // 5% discount applied on 1.5
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Exception during test for user with multiple previous visits.");
+        }
+    }
+
 
 
 }
