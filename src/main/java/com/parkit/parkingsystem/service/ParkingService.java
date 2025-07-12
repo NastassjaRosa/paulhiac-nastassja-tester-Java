@@ -114,7 +114,7 @@ public class ParkingService {
             int nbPreviousTickets = ticketDAO.getNbTicket(vehicleRegNumber);
             // Appelle la méthode calculateFare qui applique la gratuité si stationnement < 30 min,
 // et une remise de 5 % si l’utilisateur a déjà plus d’un ticket (utilisateur récurrent)
-            fareCalculatorService.calculateFare(ticket, nbPreviousTickets > 1);
+            fareCalculatorService.calculateFare(ticket, nbPreviousTickets > 1); //Correction ici
 
             if(ticketDAO.updateTicket(ticket)) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
